@@ -814,15 +814,18 @@ footer a{color:var(--accent);text-decoration:none}
       <div class="upload-hint">hoặc <span>nhấn để duyệt file</span> · JPG, PNG, WEBP</div>
     </label>
     <input type="file" id="fileInput" accept="image/jpeg,image/png,image/webp"/>
-    
-    <div style="margin-top: 16px; display: flex; gap: 12px; justify-content: center; flex-wrap: wrap;">
-      <button type="button" class="btn-camera" id="btnOpenCamera">
-        <span>📷</span> Chụp ảnh từ Camera
-      </button>
-      <button type="button" class="btn-library" id="btnOpenLibrary">
-        <span>📁</span> Chọn ảnh từ Thư viện
-      </button>
-    </div>
+  </div>
+
+  <!-- Buttons separated from upload-card to avoid label click conflict -->
+  <div style="margin-top: 16px; display: flex; gap: 12px; justify-content: center; flex-wrap: wrap;">
+    <button type="button" class="btn-camera" id="btnOpenCamera">
+      <span>📷</span> Chụp ảnh từ Camera
+    </button>
+    <button type="button" class="btn-library" id="btnOpenLibrary">
+      <span>📁</span> Chọn ảnh từ Thư viện
+    </button>
+    <!-- Hidden file input exclusively for Library button, avoids label[for] conflict -->
+    <input type="file" id="libraryFileInput" accept="image/jpeg,image/png,image/webp"/>
   </div>
 
   <!-- Collapsible Supported Waste List -->
@@ -1008,7 +1011,8 @@ const scanOverlay= document.getElementById('scanOverlay');
 const toast      = document.getElementById('toast');
 const modelSelect= document.getElementById('modelSelect');
 
-const btnOpenLibrary = document.getElementById('btnOpenLibrary');
+const btnOpenLibrary    = document.getElementById('btnOpenLibrary');
+const libraryFileInput = document.getElementById('libraryFileInput');
 const consentModal   = document.getElementById('consentModal');
 const btnConsentDecline = document.getElementById('btnConsentDecline');
 const btnConsentAccept  = document.getElementById('btnConsentAccept');
@@ -1021,7 +1025,8 @@ let consentResolve = null;
 btnOpenLibrary.addEventListener('click', e => {
   e.preventDefault();
   e.stopPropagation();
-  fileInput.click();
+  libraryFileInput.value = ''; // Reset giá trị để có thể chọn lại cùng file
+  libraryFileInput.click();
 });
 
 // ── Consent Handling ────────────────────────────────────────────
@@ -1080,6 +1085,12 @@ dropZone.addEventListener('drop',e=>{
   }
 });
 fileInput.addEventListener('change',e=>{
+  if(e.target.files[0]) {
+    isFromCamera = false;
+    loadFile(e.target.files[0]);
+  }
+});
+libraryFileInput.addEventListener('change',e=>{
   if(e.target.files[0]) {
     isFromCamera = false;
     loadFile(e.target.files[0]);
@@ -1347,13 +1358,13 @@ btnCapture.addEventListener('click', e => {
   }, 'image/jpeg', 0.95);
 });
 
-// Auto-trigger camera on page load
+// Kiểm tra kết nối bảo mật khi tải trang (Camera chỉ mở khi người dùng nhấn nút)
 window.addEventListener('DOMContentLoaded', () => {
   if (!window.isSecureContext && !['localhost', '127.0.0.1'].includes(window.location.hostname)) {
     showToast('⚠ Trình duyệt yêu cầu kết nối bảo mật (HTTPS) để mở Camera');
   }
-  // Thử mở camera tự động
-  startCamera();
+  // Hiển thị vùng upload mặc định, camera chỉ mở khi nhấn nút "Chụp ảnh từ Camera"
+  dropZone.style.display = '';
 });
 
 // ── Reset ────────────────────────────────────────────────────────
