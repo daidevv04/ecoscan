@@ -1128,6 +1128,36 @@ function loadFile(file){
   reader.readAsDataURL(file);
 }
 
+// ── Compress Image (Giảm dung lượng ảnh trước khi tải lên server) ────────
+function compressImage(fileOrBlob, maxSize = 800, quality = 0.8) {
+  return new Promise((resolve) => {
+    const img = new Image();
+    img.onload = () => {
+      let w = img.width, h = img.height;
+      // Thu nhỏ ảnh nếu quá lớn (giữ tỉ lệ khung hình)
+      if (w > maxSize || h > maxSize) {
+        if (w > h) { h = Math.round(h * maxSize / w); w = maxSize; }
+        else       { w = Math.round(w * maxSize / h); h = maxSize; }
+      }
+      const canvas = document.createElement('canvas');
+      canvas.width = w;
+      canvas.height = h;
+      canvas.getContext('2d').drawImage(img, 0, 0, w, h);
+      canvas.toBlob(blob => {
+        URL.revokeObjectURL(img.src); // Giải phóng bộ nhớ
+        resolve(blob || fileOrBlob); // Fallback về file gốc nếu nén thất bại
+      }, 'image/jpeg', quality);
+    };
+    img.onerror = () => resolve(fileOrBlob); // Fallback
+    // Đọc ảnh từ file hoặc blob
+    if (fileOrBlob instanceof Blob) {
+      img.src = URL.createObjectURL(fileOrBlob);
+    } else {
+      resolve(fileOrBlob);
+    }
+  });
+}
+
 // ── Analyse ──────────────────────────────────────────────────────
 btnAnalyse.addEventListener('click', async ()=>{
   if(!currentFile) return;
@@ -1146,9 +1176,12 @@ btnAnalyse.addEventListener('click', async ()=>{
   scanOverlay.classList.add('active');
   resultWrap.classList.remove('visible');
 
+  // Nén ảnh trước khi gửi lên server để tránh timeout
+  const compressed = await compressImage(currentFile, 800, 0.8);
+
   const formData = new FormData();
   const filename = (currentFile && currentFile.name) ? currentFile.name : 'camera_capture.jpg';
-  formData.append('image', currentFile, filename);
+  formData.append('image', compressed, filename);
   formData.append('model_type', modelSelect.value);
 
   try{
