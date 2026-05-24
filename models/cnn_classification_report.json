@@ -1,0 +1,87 @@
+{
+  "battery": {
+    "precision": 0.125,
+    "recall": 0.2857142857142857,
+    "f1-score": 0.17391304347826086,
+    "support": 7.0
+  },
+  "biological": {
+    "precision": 0.9032258064516129,
+    "recall": 0.8484848484848485,
+    "f1-score": 0.875,
+    "support": 33.0
+  },
+  "brown-glass": {
+    "precision": 1.0,
+    "recall": 0.7,
+    "f1-score": 0.8235294117647058,
+    "support": 10.0
+  },
+  "cardboard": {
+    "precision": 0.7021276595744681,
+    "recall": 0.8461538461538461,
+    "f1-score": 0.7674418604651163,
+    "support": 39.0
+  },
+  "clothes": {
+    "precision": 0.929637526652452,
+    "recall": 0.8195488721804511,
+    "f1-score": 0.8711288711288712,
+    "support": 532.0
+  },
+  "green-glass": {
+    "precision": 0.7272727272727273,
+    "recall": 0.8,
+    "f1-score": 0.7619047619047619,
+    "support": 10.0
+  },
+  "metal": {
+    "precision": 0.8333333333333334,
+    "recall": 0.625,
+    "f1-score": 0.7142857142857143,
+    "support": 40.0
+  },
+  "paper": {
+    "precision": 0.6936936936936937,
+    "recall": 0.8461538461538461,
+    "f1-score": 0.7623762376237624,
+    "support": 91.0
+  },
+  "plastic": {
+    "precision": 0.5714285714285714,
+    "recall": 0.47619047619047616,
+    "f1-score": 0.5194805194805194,
+    "support": 42.0
+  },
+  "shoes": {
+    "precision": 0.30097087378640774,
+    "recall": 0.5535714285714286,
+    "f1-score": 0.389937106918239,
+    "support": 56.0
+  },
+  "trash": {
+    "precision": 0.0,
+    "recall": 0.0,
+    "f1-score": 0.0,
+    "support": 1.0
+  },
+  "white-glass": {
+    "precision": 0.75,
+    "recall": 0.782608695652174,
+    "f1-score": 0.7659574468085106,
+    "support": 23.0
+  },
+  "accuracy": 0.7748868778280543,
+  "macro avg": {
+    "precision": 0.6280575160161056,
+    "recall": 0.6319521915917797,
+    "f1-score": 0.6187462478215385,
+    "support": 884.0
+  },
+  "weighted avg": {
+    "precision": 0.8195341065380515,
+    "recall": 0.7748868778280543,
+    "f1-score": 0.7902000818067099,
+    "support": 884.0
+  }
+}
