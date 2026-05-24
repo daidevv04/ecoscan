@@ -6,6 +6,8 @@ from flask import Flask, request, jsonify, render_template_string
 from PIL import Image
 
 app = Flask(__name__)
+# Giới hạn dung lượng upload tối đa 5MB (ảnh đã được nén phía client)
+app.config['MAX_CONTENT_LENGTH'] = 5 * 1024 * 1024
 
 # ── Cấu hình đường dẫn model ─────────────────────────────────────────────────
 BASE_DIR  = os.path.dirname(os.path.abspath(__file__))
@@ -35,7 +37,12 @@ def get_model(model_type="mobilenet_v2"):
                     except ImportError:
                         raise ImportError("Không thể import tflite_runtime hoặc tensorflow.lite")
             
-            interpreter = tflite.Interpreter(model_path=tflite_path)
+            # Sử dụng XNNPACK delegate đa luồng để tăng tốc dự đoán trên CPU
+            num_threads = min(os.cpu_count() or 2, 4)
+            interpreter = tflite.Interpreter(
+                model_path=tflite_path,
+                num_threads=num_threads
+            )
             interpreter.allocate_tensors()
             _models[model_type] = {
                 "type": "tflite",
@@ -59,6 +66,14 @@ def get_model(model_type="mobilenet_v2"):
             _labels = json.load(f)
             
     return _models[model_type], _labels
+
+# ── Pre-load model MobileNetV2 ngay khi khởi động để request đầu tiên nhanh ──
+try:
+    print("[EcoScan] Loading MobileNetV2 model...")
+    get_model("mobilenet_v2")
+    print("[EcoScan] Model MobileNetV2 ready!")
+except Exception as e:
+    print(f"[EcoScan] Warning: Could not preload model: {e}")
 
 # ── Mapping nhãn Tiếng Việt & Phân nhóm rác thải ──────────────────────────────
 VI_LABEL = {
@@ -1455,7 +1470,8 @@ def predict():
 
         # Đọc & tiền xử lý ảnh (Dùng PIL và Numpy, hoàn toàn độc lập với TensorFlow)
         image = Image.open(io.BytesIO(file.read())).convert("RGB")
-        img_resized = image.resize((224, 224))
+        # Sử dụng LANCZOS (chất lượng cao nhất) để resize, giúp giữ chi tiết ảnh tốt hơn
+        img_resized = image.resize((224, 224), Image.Resampling.LANCZOS)
         img_array = np.array(img_resized, dtype=np.float32)
         img_array = np.expand_dims(img_array, axis=0)
         
