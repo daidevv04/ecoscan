@@ -222,7 +222,17 @@ h1{
 .upload-title{font-size:1.2rem;font-weight:600;margin-bottom:8px;color:var(--text)}
 .upload-hint{font-size:.82rem;color:var(--muted);font-family:'Space Mono',monospace}
 .upload-hint span{color:var(--accent)}
-input[type=file]{display:none}
+input[type=file]{
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  padding: 0;
+  margin: -1px;
+  overflow: hidden;
+  clip: rect(0,0,0,0);
+  border: 0;
+  opacity: 0;
+}
 
 /* ── Preview & Controls ──────────────────────────────────────── */
 .preview-wrap{
@@ -588,6 +598,201 @@ footer a{color:var(--accent);text-decoration:none}
   color: #fff;
   transform: translateY(-1px);
 }
+
+/* ── Library Button ───────────────────────────────────────────── */
+.btn-library {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  padding: 12px 24px;
+  background: rgba(33,150,243,0.12);
+  color: #2196f3;
+  border: 1px solid rgba(33,150,243,0.2);
+  border-radius: 50px;
+  font-family: 'Space Mono', monospace;
+  font-size: 0.85rem;
+  font-weight: 700;
+  cursor: pointer;
+  transition: all 0.25s ease;
+  margin-top: 16px;
+  outline: none;
+}
+.btn-library:hover {
+  background: #2196f3;
+  color: #040c06;
+  transform: translateY(-2px);
+  box-shadow: 0 4px 15px rgba(33,150,243,0.3);
+}
+
+/* ── Consent Modal ────────────────────────────────────────────── */
+.consent-modal {
+  position: fixed;
+  inset: 0;
+  background: rgba(4,10,6,0.85);
+  backdrop-filter: blur(10px);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 1000;
+  padding: 20px;
+  animation: fadeIn 0.3s ease both;
+}
+.consent-card {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: var(--r);
+  padding: 32px;
+  max-width: 480px;
+  width: 100%;
+  text-align: center;
+  box-shadow: 0 10px 40px rgba(0,0,0,0.6);
+  animation: scaleUp 0.3s cubic-bezier(0.34, 1.56, 0.64, 1) both;
+}
+.consent-icon {
+  font-size: 3rem;
+  display: block;
+  margin-bottom: 16px;
+  animation: iconPulse 2s ease-in-out infinite;
+}
+.consent-card h3 {
+  font-family: 'Syne', sans-serif;
+  font-size: 1.4rem;
+  color: var(--accent);
+  margin-bottom: 12px;
+}
+.consent-card p {
+  font-size: 0.9rem;
+  color: var(--text);
+  line-height: 1.6;
+  margin-bottom: 12px;
+}
+.consent-card p.consent-sub {
+  font-size: 0.78rem;
+  color: var(--muted);
+  font-style: italic;
+  margin-bottom: 24px;
+}
+.consent-buttons {
+  display: flex;
+  gap: 12px;
+  justify-content: center;
+}
+.btn-consent-decline {
+  padding: 12px 24px;
+  background: rgba(231,76,60,0.12);
+  color: var(--danger);
+  border: 1px solid rgba(231,76,60,0.2);
+  border-radius: 50px;
+  font-family: 'Space Mono', monospace;
+  font-size: 0.85rem;
+  font-weight: 700;
+  cursor: pointer;
+  flex: 1;
+  transition: all 0.25s ease;
+}
+.btn-consent-decline:hover {
+  background: var(--danger);
+  color: #fff;
+  transform: translateY(-2px);
+}
+.btn-consent-accept {
+  padding: 12px 24px;
+  background: var(--accent);
+  color: #040c06;
+  border: none;
+  border-radius: 50px;
+  font-family: 'Space Mono', monospace;
+  font-size: 0.85rem;
+  font-weight: 700;
+  cursor: pointer;
+  flex: 1.5;
+  transition: all 0.25s ease;
+}
+.btn-consent-accept:hover {
+  background: var(--accent2);
+  transform: translateY(-2px);
+  box-shadow: 0 4px 15px rgba(46,204,113,0.3);
+}
+@keyframes fadeIn {
+  from { opacity: 0; }
+  to { opacity: 1; }
+}
+@keyframes scaleUp {
+  from { transform: scale(0.9); opacity: 0; }
+  to { transform: scale(1); opacity: 1; }
+}
+@keyframes iconPulse {
+  0%, 100% { transform: scale(1); }
+  50% { transform: scale(1.1); filter: drop-shadow(0 0 8px rgba(46,204,113,0.4)); }
+}
+
+/* ── Supported Wastes list ───────────────────────────────────── */
+.supported-wastes-container {
+  margin-top: 24px;
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: var(--r);
+  overflow: hidden;
+  transition: border-color 0.25s;
+}
+.supported-wastes-container:hover {
+  border-color: rgba(46,204,113,0.4);
+}
+.btn-toggle-supported {
+  width: 100%;
+  padding: 14px 20px;
+  background: transparent;
+  border: none;
+  color: var(--accent);
+  font-family: 'Space Mono', monospace;
+  font-size: 0.8rem;
+  font-weight: 700;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  cursor: pointer;
+  outline: none;
+}
+.btn-toggle-supported span.arrow-icon {
+  transition: transform 0.3s ease;
+  font-size: 0.9rem;
+}
+.btn-toggle-supported.active span.arrow-icon {
+  transform: rotate(90deg);
+}
+.supported-list {
+  background: rgba(0,0,0,0.2);
+}
+.supported-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(180px, 1fr));
+  gap: 12px;
+  padding: 20px;
+}
+.supported-item {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 10px 14px;
+  background: rgba(14,35,19,0.4);
+  border: 1px solid rgba(46,204,113,0.08);
+  border-left: 3px solid var(--item-color);
+  border-radius: 8px;
+  transition: all 0.2s ease;
+}
+.supported-item:hover {
+  background: rgba(14,35,19,0.8);
+  transform: translateY(-1px);
+  border-color: rgba(46,204,113,0.2);
+}
+.item-icon {
+  font-size: 1.1rem;
+}
+.item-name {
+  font-size: 0.78rem;
+  color: var(--text);
+  font-weight: 600;
+}
 </style>
 </head>
 <body>
@@ -610,10 +815,72 @@ footer a{color:var(--accent);text-decoration:none}
     </label>
     <input type="file" id="fileInput" accept="image/jpeg,image/png,image/webp"/>
     
-    <div style="margin-top: 10px;">
+    <div style="margin-top: 16px; display: flex; gap: 12px; justify-content: center; flex-wrap: wrap;">
       <button type="button" class="btn-camera" id="btnOpenCamera">
         <span>📷</span> Chụp ảnh từ Camera
       </button>
+      <button type="button" class="btn-library" id="btnOpenLibrary">
+        <span>📁</span> Chọn ảnh từ Thư viện
+      </button>
+    </div>
+  </div>
+
+  <!-- Collapsible Supported Waste List -->
+  <div class="supported-wastes-container">
+    <button type="button" class="btn-toggle-supported" id="btnToggleSupported">
+      <span>🔍 Xem danh mục rác nhận diện được (12 nhóm)</span> <span class="arrow-icon">▸</span>
+    </button>
+    <div class="supported-list" id="supportedList" style="max-height: 0px; overflow: hidden; transition: max-height 0.3s ease-out;">
+      <div class="supported-grid">
+        <div class="supported-item" style="--item-color: #ff4444">
+          <span class="item-icon">⚡</span>
+          <span class="item-name">Pin / Rác nguy hại</span>
+        </div>
+        <div class="supported-item" style="--item-color: #4caf50">
+          <span class="item-icon">🌱</span>
+          <span class="item-name">Rác hữu cơ phân hủy</span>
+        </div>
+        <div class="supported-item" style="--item-color: #a0784a">
+          <span class="item-icon">🍶</span>
+          <span class="item-name">Thủy tinh màu nâu</span>
+        </div>
+        <div class="supported-item" style="--item-color: #ff9800">
+          <span class="item-icon">📦</span>
+          <span class="item-name">Bìa carton</span>
+        </div>
+        <div class="supported-item" style="--item-color: #ab47bc">
+          <span class="item-icon">👕</span>
+          <span class="item-name">Quần áo, vải vóc cũ</span>
+        </div>
+        <div class="supported-item" style="--item-color: #00bfa5">
+          <span class="item-icon">🍵</span>
+          <span class="item-name">Thủy tinh màu xanh</span>
+        </div>
+        <div class="supported-item" style="--item-color: #78909c">
+          <span class="item-icon">🔩</span>
+          <span class="item-name">Lon/Vật dụng kim loại</span>
+        </div>
+        <div class="supported-item" style="--item-color: #ffeb3b">
+          <span class="item-icon">📄</span>
+          <span class="item-name">Giấy báo/vở cũ</span>
+        </div>
+        <div class="supported-item" style="--item-color: #2196f3">
+          <span class="item-icon">🧴</span>
+          <span class="item-name">Hộp/Chai nhựa</span>
+        </div>
+        <div class="supported-item" style="--item-color: #ec407a">
+          <span class="item-icon">👟</span>
+          <span class="item-name">Giày dép cũ</span>
+        </div>
+        <div class="supported-item" style="--item-color: #bdbdbd">
+          <span class="item-icon">🗑️</span>
+          <span class="item-name">Rác sinh hoạt chung</span>
+        </div>
+        <div class="supported-item" style="--item-color: #e0f7fa">
+          <span class="item-icon">🥃</span>
+          <span class="item-name">Thủy tinh trong suốt</span>
+        </div>
+      </div>
     </div>
   </div>
 
@@ -712,6 +979,20 @@ footer a{color:var(--accent);text-decoration:none}
 
 <div class="toast" id="toast"></div>
 
+<!-- Privacy Consent Modal -->
+<div id="consentModal" class="consent-modal" style="display:none;">
+  <div class="consent-card">
+    <span class="consent-icon">🛡️</span>
+    <h3>Quyền Phân Tích Hình Ảnh</h3>
+    <p>Để thực hiện phân tích phân loại bằng công nghệ AI, EcoScan cần tải ảnh của bạn lên máy chủ để xử lý.</p>
+    <p class="consent-sub">Chúng tôi cam kết hình ảnh chỉ sử dụng để phân tích phân loại rác và tự động xóa sau khi xử lý.</p>
+    <div class="consent-buttons">
+      <button type="button" class="btn-consent-decline" id="btnConsentDecline">Từ chối</button>
+      <button type="button" class="btn-consent-accept" id="btnConsentAccept">Tôi đồng ý & Cho phép</button>
+    </div>
+  </div>
+</div>
+
 <!-- ── Scripts ───────────────────────────────────────────────── -->
 <script>
 const dropZone   = document.getElementById('dropZone');
@@ -727,8 +1008,58 @@ const scanOverlay= document.getElementById('scanOverlay');
 const toast      = document.getElementById('toast');
 const modelSelect= document.getElementById('modelSelect');
 
+const btnOpenLibrary = document.getElementById('btnOpenLibrary');
+const consentModal   = document.getElementById('consentModal');
+const btnConsentDecline = document.getElementById('btnConsentDecline');
+const btnConsentAccept  = document.getElementById('btnConsentAccept');
+
 let currentFile = null;
 let isFromCamera = false;
+let consentResolve = null;
+
+// ── Open Photo Library ──────────────────────────────────────────
+btnOpenLibrary.addEventListener('click', e => {
+  e.preventDefault();
+  e.stopPropagation();
+  fileInput.click();
+});
+
+// ── Consent Handling ────────────────────────────────────────────
+function askUserConsent() {
+  consentModal.style.display = 'flex';
+  return new Promise((resolve) => {
+    consentResolve = resolve;
+  });
+}
+
+btnConsentAccept.addEventListener('click', () => {
+  consentModal.style.display = 'none';
+  if (consentResolve) {
+    consentResolve(true);
+    consentResolve = null;
+  }
+});
+
+btnConsentDecline.addEventListener('click', () => {
+  consentModal.style.display = 'none';
+  if (consentResolve) {
+    consentResolve(false);
+    consentResolve = null;
+  }
+});
+
+// ── Supported List Toggle ───────────────────────────────────────
+const btnToggleSupported = document.getElementById('btnToggleSupported');
+const supportedList      = document.getElementById('supportedList');
+
+btnToggleSupported.addEventListener('click', () => {
+  btnToggleSupported.classList.toggle('active');
+  if (supportedList.style.maxHeight === '0px' || !supportedList.style.maxHeight) {
+    supportedList.style.maxHeight = supportedList.scrollHeight + 'px';
+  } else {
+    supportedList.style.maxHeight = '0px';
+  }
+});
 
 // ── Toast ───────────────────────────────────────────────────────
 function showToast(msg, dur=2800){
@@ -790,6 +1121,13 @@ function loadFile(file){
 btnAnalyse.addEventListener('click', async ()=>{
   if(!currentFile) return;
 
+  // Yêu cầu sự cho phép sử dụng hình ảnh từ người dùng
+  const consented = await askUserConsent();
+  if (!consented) {
+    showToast('⚠ Bạn đã từ chối cấp quyền phân tích hình ảnh.');
+    return;
+  }
+
   // UI loading
   btnAnalyse.disabled = true;
   btnText.style.display='none';
@@ -798,7 +1136,8 @@ btnAnalyse.addEventListener('click', async ()=>{
   resultWrap.classList.remove('visible');
 
   const formData = new FormData();
-  formData.append('image', currentFile);
+  const filename = (currentFile && currentFile.name) ? currentFile.name : 'camera_capture.jpg';
+  formData.append('image', currentFile, filename);
   formData.append('model_type', modelSelect.value);
 
   try{
@@ -833,15 +1172,26 @@ btnAnalyse.addEventListener('click', async ()=>{
 // ── Render result ────────────────────────────────────────────────
 function renderResult(data){
   const {label_en, label_vi, icon, cat, color, confidence, top3, eco_tip} = data;
-
-  document.getElementById('resIcon').textContent = icon;
-  document.getElementById('resCat').textContent  = cat;
-  document.getElementById('resCat').style.color  = color;
-  document.getElementById('resCat').style.background = color+'22';
-  document.getElementById('resName').textContent = label_vi;
-  document.getElementById('resName').style.color = color;
-
   const pct = Math.round(confidence);
+  const isGarbage = (pct >= 45);
+
+  if (isGarbage) {
+    document.getElementById('resIcon').textContent = icon;
+    document.getElementById('resCat').textContent  = cat;
+    document.getElementById('resCat').style.color  = color;
+    document.getElementById('resCat').style.background = color+'22';
+    document.getElementById('resName').textContent = label_vi;
+    document.getElementById('resName').style.color = color;
+  } else {
+    // Không nhận diện được hoặc không phải rác thải
+    document.getElementById('resIcon').textContent = "⚠️";
+    document.getElementById('resCat').textContent  = "KHÔNG RÕ / KHÔNG PHẢI RÁC THẢI";
+    document.getElementById('resCat').style.color  = "var(--danger)";
+    document.getElementById('resCat').style.background = "rgba(231,76,60,0.12)";
+    document.getElementById('resName').textContent = "Vật thể không xác định";
+    document.getElementById('resName').style.color = "var(--danger)";
+  }
+
   document.getElementById('confPct').textContent = pct + '%';
 
   // animate bar after short delay
@@ -849,20 +1199,19 @@ function renderResult(data){
     requestAnimationFrame(()=>{
       document.getElementById('confBar').style.width = pct+'%';
       document.getElementById('confBar').style.background =
-        pct>=70 ? 'linear-gradient(90deg,#2ecc71,#a8ff78)'
-        : pct>=45 ? 'linear-gradient(90deg,#f39c12,#f1c40f)'
+        isGarbage ? (pct>=70 ? 'linear-gradient(90deg,#2ecc71,#a8ff78)' : 'linear-gradient(90deg,#f39c12,#f1c40f)')
         : 'linear-gradient(90deg,#e74c3c,#ff8a80)';
     });
   });
 
   // tip
   const tip = document.getElementById('resTip');
-  if(pct >= 45){
+  if(isGarbage){
     tip.className='result-tip ok';
     tip.innerHTML = `<div style="font-weight:800;color:var(--accent);margin-bottom:6px;font-size:0.9rem">🌿 HƯỚNG DẪN TÁI CHẾ & XỬ LÝ:</div>${eco_tip}`;
   } else {
     tip.className='result-tip err';
-    tip.textContent='✗ Độ tin cậy dự đoán quá thấp. Có thể góc chụp hoặc ánh sáng chưa đủ tốt để phân tích chính xác lớp rác thải này. Bạn vui lòng đổi ảnh rõ nét hơn!';
+    tip.innerHTML = `<div style="font-weight:800;color:var(--danger);margin-bottom:6px;font-size:0.9rem">⚠️ CẢNH BÁO KHÔNG NHẬN DIỆN ĐƯỢC:</div>Độ tin cậy dự đoán quá thấp (${pct}%). Vật thể trong ảnh có thể không phải là rác thải nằm trong danh mục phân loại tiêu chuẩn của hệ thống, hoặc ảnh chụp bị mờ/thiếu sáng. Vui lòng chụp rõ nét đối tượng rác thải cần phân tích.`;
   }
 
   // top-3
@@ -990,9 +1339,8 @@ btnCapture.addEventListener('click', e => {
   canvas.toBlob(blob => {
     if (blob) {
       isFromCamera = true; // Đánh dấu ảnh này chụp từ camera
-      const file = new File([blob], "camera_capture.jpg", { type: "image/jpeg" });
       stopCamera();
-      loadFile(file);
+      loadFile(blob);
     } else {
       showToast('❌ Không thể trích xuất ảnh từ camera');
     }
