@@ -12,8 +12,6 @@ def convert_to_tflite():
         model = tf.keras.models.load_model(cnn_keras_path)
         print("Converting CNN to TFLite...")
         converter = tf.lite.TFLiteConverter.from_keras_model(model)
-        # Optional: optimize for size
-        converter.optimizations = [tf.lite.Optimize.DEFAULT]
         tflite_model = converter.convert()
         with open(cnn_tflite_path, "wb") as f:
             f.write(tflite_model)
@@ -29,8 +27,6 @@ def convert_to_tflite():
         model = tf.keras.models.load_model(mobilenet_keras_path)
         print("Converting MobileNetV2 to TFLite...")
         converter = tf.lite.TFLiteConverter.from_keras_model(model)
-        # Optional: optimize for size
-        converter.optimizations = [tf.lite.Optimize.DEFAULT]
         tflite_model = converter.convert()
         with open(mobilenet_tflite_path, "wb") as f:
             f.write(tflite_model)
