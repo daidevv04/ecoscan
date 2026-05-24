@@ -14,20 +14,45 @@ LABEL_PATH = os.path.join(BASE_DIR, "..", "models", "label_mapping.json")
 # ── Lazy-load model cache ────────────────────────────────────────────────────
 _models = {}
 _labels = None
+tflite = None
 
 def get_model(model_type="mobilenet_v2"):
-    global _models, _labels
+    global _models, _labels, tflite
     if model_type not in _models:
-        import tensorflow as tf
-        if model_type == "cnn":
-            path = os.path.join(BASE_DIR, "..", "models", "cnn_garbage_best.keras")
+        # Ưu tiên sử dụng TFLite (.tflite) để tiết kiệm bộ nhớ RAM trên hosting
+        tflite_path = os.path.join(BASE_DIR, "..", "models", f"{'cnn' if model_type == 'cnn' else 'mobilenetv2'}_garbage_best.tflite")
+        keras_path = os.path.join(BASE_DIR, "..", "models", f"{'cnn' if model_type == 'cnn' else 'mobilenetv2'}_garbage_best.keras")
+        
+        if os.path.exists(tflite_path):
+            if tflite is None:
+                try:
+                    import tflite_runtime.interpreter as tflite_mod
+                    tflite = tflite_mod
+                except ImportError:
+                    try:
+                        from tensorflow import lite as tflite_mod
+                        tflite = tflite_mod
+                    except ImportError:
+                        raise ImportError("Không thể import tflite_runtime hoặc tensorflow.lite")
+            
+            interpreter = tflite.Interpreter(model_path=tflite_path)
+            interpreter.allocate_tensors()
+            _models[model_type] = {
+                "type": "tflite",
+                "interpreter": interpreter,
+                "input_details": interpreter.get_input_details(),
+                "output_details": interpreter.get_output_details()
+            }
         else:
-            path = os.path.join(BASE_DIR, "..", "models", "mobilenetv2_garbage_best.keras")
-        
-        if not os.path.exists(path):
-            raise FileNotFoundError(f"Không tìm thấy file model tại: {path}")
-        
-        _models[model_type] = tf.keras.models.load_model(path)
+            # Fallback về model Keras (yêu cầu cài đặt thư viện tensorflow đầy đủ)
+            if not os.path.exists(keras_path):
+                raise FileNotFoundError(f"Không tìm thấy file model tại: {keras_path}")
+            import tensorflow as tf
+            model = tf.keras.models.load_model(keras_path)
+            _models[model_type] = {
+                "type": "keras",
+                "model": model
+            }
         
     if _labels is None:
         with open(LABEL_PATH, "r", encoding="utf-8") as f:
@@ -1033,26 +1058,37 @@ def predict():
     model_type = request.form.get("model_type", "mobilenet_v2")
 
     try:
-        import tensorflow as tf
-        
-        # Lấy mô hình và nhãn tương ứng động
-        model, labels_dict = get_model(model_type)
+        # Lấy thông tin mô hình và nhãn tương ứng động
+        model_info, labels_dict = get_model(model_type)
 
-        # Đọc & tiền xử lý ảnh
+        # Đọc & tiền xử lý ảnh (Dùng PIL và Numpy, hoàn toàn độc lập với TensorFlow)
         image = Image.open(io.BytesIO(file.read())).convert("RGB")
         img_resized = image.resize((224, 224))
-        img_array = tf.keras.preprocessing.image.img_to_array(img_resized)
+        img_array = np.array(img_resized, dtype=np.float32)
         img_array = np.expand_dims(img_array, axis=0)
         
         # Tiền xử lý theo từng loại mô hình
         if model_type == "mobilenet_v2":
-            img_array = tf.keras.applications.mobilenet_v2.preprocess_input(img_array)
+            # MobileNetV2 preprocess_input: chuyển thang màu pixel về [-1, 1]
+            img_array = (img_array / 127.5) - 1.0
         else:
             # CNN Baseline chạy ở range [0, 1]
             img_array = img_array / 255.0
 
-        # Dự đoán
-        preds = model.predict(img_array)[0]  # shape (num_classes,)
+        # Tiến hành dự đoán dựa trên định dạng mô hình đã tải
+        if model_info["type"] == "tflite":
+            interpreter = model_info["interpreter"]
+            input_details = model_info["input_details"]
+            output_details = model_info["output_details"]
+            
+            interpreter.set_tensor(input_details[0]['index'], img_array)
+            interpreter.invoke()
+            preds = interpreter.get_tensor(output_details[0]['index'])[0]
+        else:
+            # Fallback Keras
+            model = model_info["model"]
+            preds = model.predict(img_array)[0]  # shape (num_classes,)
+
         top_indices = np.argsort(preds)[::-1][:3]
 
         pred_idx   = int(top_indices[0])
