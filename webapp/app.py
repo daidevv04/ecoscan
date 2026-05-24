@@ -37,11 +37,10 @@ def get_model(model_type="mobilenet_v2"):
                     except ImportError:
                         raise ImportError("Không thể import tflite_runtime hoặc tensorflow.lite")
             
-            # Sử dụng XNNPACK delegate đa luồng để tăng tốc dự đoán trên CPU
-            num_threads = min(os.cpu_count() or 2, 4)
+            # Tối ưu cho Render free tier (512MB RAM): chỉ dùng 2 threads
             interpreter = tflite.Interpreter(
                 model_path=tflite_path,
-                num_threads=num_threads
+                num_threads=2
             )
             interpreter.allocate_tensors()
             _models[model_type] = {
@@ -66,14 +65,6 @@ def get_model(model_type="mobilenet_v2"):
             _labels = json.load(f)
             
     return _models[model_type], _labels
-
-# ── Pre-load model MobileNetV2 ngay khi khởi động để request đầu tiên nhanh ──
-try:
-    print("[EcoScan] Loading MobileNetV2 model...")
-    get_model("mobilenet_v2")
-    print("[EcoScan] Model MobileNetV2 ready!")
-except Exception as e:
-    print(f"[EcoScan] Warning: Could not preload model: {e}")
 
 # ── Mapping nhãn Tiếng Việt & Phân nhóm rác thải ──────────────────────────────
 VI_LABEL = {
