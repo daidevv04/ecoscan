@@ -1,0 +1,24 @@
+{
+  "image_size": [
+    224,
+    224
+  ],
+  "num_classes": 12,
+  "model_preprocessing": "mobilenet_v2",
+  "class_names": [
+    "battery",
+    "biological",
+    "brown-glass",
+    "cardboard",
+    "clothes",
+    "green-glass",
+    "metal",
+    "paper",
+    "plastic",
+    "shoes",
+    "trash",
+    "white-glass"
+  ],
+  "test_accuracy": 0.9458064516129032,
+  "test_macro_f1": 0.9217536090772409
+}
